@@ -3,6 +3,7 @@ version: 2
 
 build:
   os: ubuntu-24.04
+  image: latest
   tools:
     python: "3.13"
 
@@ -21,6 +22,3 @@ formats:
   - htmlzip
   - pdf
   - epub
-
-build:
-  image: latest
