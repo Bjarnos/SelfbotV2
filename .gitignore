@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+
+.venv/
+*.env
+
+reversed/
+http_cache.sqlite
+selfbotv1.py
+user_client.py
