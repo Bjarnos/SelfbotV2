@@ -4,15 +4,15 @@ dotenv.load_dotenv()
 
 ## Shared ##
 # Dev/production mode
-version = os.getenv("VERSION")
+version = "SelfbotV2 0.0.1"
 show_http = True
 
 # OAUTH info
-client_id = os.getenv("CLIENT_ID")
-redirect_uri = os.getenv("REDIRECT_URI")
+client_id = "E5F3304E-41BF-4793-A4CD-A36C04FD4B5C"
+redirect_uri = "https://bjarnos.dev/"
 
 # Http urls (client)
-base = os.getenv("BASE")
+base = "chat.jonazwetsloot.nl"
 url = f"https://{base}"
 login_url = f"{url}/login"
 actionlogin_url = f"{url}/actionlogin"
@@ -22,7 +22,7 @@ api_url = f"{url}/api/v1"
 approve_url = f"{api_url}/approve"
 approve2_url = f"{api_url}/handle-permission"
 
-server = os.getenv("SERVER")
+server = "http://127.0.0.1:5000"
 server_connect = f"{server}/c"
 server_question = f"{server}/r"
 server_read = f"{server}/d"
