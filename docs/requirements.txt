@@ -1,8 +1,0 @@
-# Docs only
-sphinx
-sphinx_rtd_theme
-
-# From requirements.txt
-python-dotenv
-requests
-bs4

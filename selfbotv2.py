@@ -12,7 +12,7 @@ from modules.classes import *
 ## Group messages
 # ask Jona
 # join group function?
-# group messages endpoint
+# group messages endpoint (get previous messages)
 ## Laatste endpoints
 # adjust profile
 # DELETE endpoints
@@ -108,6 +108,37 @@ class Bot():
             show_message(
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False, None
+        
+    async def delete_message(self, id: int) -> bool:
+        if not check_type(id, int, 2): return
+
+        token = bot_sessions[self].token
+        if token:
+            data = {
+                "auth": bot_sessions[self].token,
+                "method": "delete",
+                "endpoint": "message",
+                "data": {
+                    "id": id
+                }
+            }
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason') or "<no reason provided>"
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                return False
+            else:
+                data = response.json()['json']
+                return data.get('error') == None
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return False
         
     async def like_message(self, id: int, unlike: bool = False) -> bool:
         if not check_type(id, int, 2): return
@@ -243,6 +274,37 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
+    async def delete_contact(self, user: str) -> bool:
+        if not check_type(user, str, 2): return
+
+        token = bot_sessions[self].token
+        if token:
+            data = {
+                "auth": bot_sessions[self].token,
+                "method": "delete",
+                "endpoint": "contact",
+                "data": {
+                    "user": user
+                }
+            }
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason') or "<no reason provided>"
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                return False
+            else:
+                data = response.json()['json']
+                return data.get('error') == None
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return False
+        
     async def send_dm(self, user: str, message: str) -> tuple[bool, int]:
         if not check_type(user, str, 2): return
         if not check_type(message, str, 3): return
@@ -276,6 +338,37 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False, None
         
+    async def delete_dm(self, id: int) -> bool:
+        if not check_type(id, int, 2): return
+
+        token = bot_sessions[self].token
+        if token:
+            data = {
+                "auth": bot_sessions[self].token,
+                "method": "delete",
+                "endpoint": "direct-message",
+                "data": {
+                    "id": id
+                }
+            }
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason') or "<no reason provided>"
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                return False
+            else:
+                data = response.json()['json']
+                return data.get('error') == None
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return False
+        
     async def edit_dm(self, id: int, message: str) -> tuple[bool, int]:
         if not check_type(id, int, 2): return
         if not check_type(message, str, 3): return
@@ -289,6 +382,37 @@ class Bot():
                 "data": {
                     "id": id,
                     "message": message
+                }
+            }
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason') or "<no reason provided>"
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                return False
+            else:
+                data = response.json()['json']
+                return data.get('error') == None
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return False
+        
+    async def delete_dm(self, id: int) -> bool:
+        if not check_type(id, int, 2): return
+
+        token = bot_sessions[self].token
+        if token:
+            data = {
+                "auth": bot_sessions[self].token,
+                "method": "delete",
+                "endpoint": "group-message",
+                "data": {
+                    "id": id
                 }
             }
             success, response = server_request(type="post", data=data)
