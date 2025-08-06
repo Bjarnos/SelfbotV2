@@ -99,7 +99,7 @@ class Profile():
 
         self._success: bool = True
 
-    def refresh(self):
+    async def refresh(self):
         return Profile(userid=self.id)
 
 class Contact():
@@ -180,7 +180,7 @@ class Channel():
         self.name: str = api_response.get('name')
         self.type: str = api_response.get('type')
 
-    def send_message(self, message: str) -> tuple[bool, int]:
+    async def send_message(self, message: str) -> tuple[bool, int]:
         if not check_type(message, str, 2): return
 
         token = self.session.token
@@ -282,13 +282,13 @@ class Group():
 
         self._success: bool = True
 
-    def get_admins(self) -> list[Profile]:
+    async def get_admins(self) -> list[Profile]:
         admins = []
         for id in self.admin_ids:
             admins.append(Profile(userid=id))
         return admins
     
-    def get_members(self) -> list[Profile]:
+    async def get_members(self) -> list[Profile]:
         members = []
         for id in self.user_ids:
             members.append(Profile(userid=id))
@@ -304,7 +304,7 @@ class Group():
         if not check_type(user, Profile, 2): return
         return user.id in self.admin_ids
     
-    def send_message(self, message: str) -> tuple[bool, int]:
+    async def send_message(self, message: str) -> tuple[bool, int]:
         if not check_type(message, str, 2): return
 
         token = self.session.token

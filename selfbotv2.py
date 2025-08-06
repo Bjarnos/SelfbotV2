@@ -45,7 +45,7 @@ class Bot():
         bot_sessions[self] = Session(user, password)
 
     # Standard methods
-    def send_message(self, message: str) -> tuple[bool, int]:
+    async def send_message(self, message: str) -> tuple[bool, int]:
         if not check_type(message, str, 2): return
 
         token = bot_sessions[self].token
@@ -76,7 +76,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False, None
         
-    def send_reaction(self, id: int, message: str) -> tuple[bool, int]:
+    async def send_reaction(self, id: int, message: str) -> tuple[bool, int]:
         if not check_type(id, int, 2): return
         if not check_type(message, str, 3): return
 
@@ -109,7 +109,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False, None
         
-    def like_message(self, id: int, unlike: bool = False) -> bool:
+    async def like_message(self, id: int, unlike: bool = False) -> bool:
         if not check_type(id, int, 2): return
         if not check_type(unlike, bool, 3): return
 
@@ -142,7 +142,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    def edit_message(self, id: int, message: str) -> bool:
+    async def edit_message(self, id: int, message: str) -> bool:
         if not check_type(id, int, 2): return
         if not check_type(message, str, 3): return
 
@@ -175,7 +175,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    def get_contacts(self) -> dict[Contact]:
+    async def get_contacts(self) -> dict[Contact]:
         token = bot_sessions[self].token
         if token:
             data = {
@@ -205,14 +205,14 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return {}
         
-    def get_contact(self, user: str) -> Contact | None:
+    async def get_contact(self, user: str) -> Contact | None:
         if not check_type(user, str, 2): return
 
         profile = Contact(username=user)
         if profile._success != False:
             return profile
         
-    def add_contact(self, user: str) -> bool:
+    async def add_contact(self, user: str) -> bool:
         if not check_type(user, str, 2): return
 
         token = bot_sessions[self].token
@@ -243,7 +243,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    def send_dm(self, user: str, message: str) -> tuple[bool, int]:
+    async def send_dm(self, user: str, message: str) -> tuple[bool, int]:
         if not check_type(user, str, 2): return
         if not check_type(message, str, 3): return
 
@@ -276,7 +276,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False, None
         
-    def edit_dm(self, id: int, message: str) -> tuple[bool, int]:
+    async def edit_dm(self, id: int, message: str) -> tuple[bool, int]:
         if not check_type(id, int, 2): return
         if not check_type(message, str, 3): return
 
@@ -309,7 +309,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    def get_groups(self) -> dict[Group]:
+    async def get_groups(self) -> dict[Group]:
         token = bot_sessions[self].token
         if token:
             data = {
@@ -339,7 +339,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return {}
         
-    def get_group(self, title: str) -> Group | None:
+    async def get_group(self, title: str) -> Group | None:
         if not check_type(title, str, 2): return
 
         token = bot_sessions[self].token
@@ -373,6 +373,9 @@ class Bot():
     # @ methods
     def event(self, func: function) -> function:
         if not check_type(func, function, 2): return
+        if not inspect.iscoroutinefunction(func):
+            show_message("@bot.event must be an async function!", "Error")
+            return
 
         bot_session = bot_sessions.get(self)
         if not bot_session: return # creating bot had an error
@@ -474,7 +477,7 @@ def create_session(username: str, password: str) -> Bot:
 
 
 ## Public methods ##
-def is_username_available(username: str) -> bool:
+async def is_username_available(username: str) -> bool:
     if not check_type(username, str, 1): return
     data = {
         "auth": None,
@@ -497,7 +500,7 @@ def is_username_available(username: str) -> bool:
         data = response.json()['json']
         return data.get('available')
     
-def is_email_available(email: str) -> bool:
+async def is_email_available(email: str) -> bool:
     if not check_type(email, str, 1): return
 
     data = {
@@ -521,7 +524,7 @@ def is_email_available(email: str) -> bool:
         data = response.json()['json']
         return data.get('valid') and data.get('available')
     
-def is_email_verified(user: str) -> bool:
+async def is_email_verified(user: str) -> bool:
     if not check_type(user, str, 1): return
 
     data = {
@@ -545,7 +548,7 @@ def is_email_verified(user: str) -> bool:
         data = response.json()['json']
         return data.get('verified')
     
-def get_profile(user: int|str) -> Profile | None:
+async def get_profile(user: int|str) -> Profile | None:
     if not isinstance(user, (int, str)):
         show_message(
             f"Expected arg1 to be class str or int instead of {user.__class__.__name__} in get_profile(user: int | str) -> modules.classes.Profile | None", "Error")
@@ -559,12 +562,9 @@ def get_profile(user: int|str) -> Profile | None:
         profile = Profile(username=user)
         if profile._success != False:
             return profile
-    
-def create_account(user: str, email: str, password: str) -> None:
-    raise NotImplementedError("This function has not been added to the library, and never will be, for security and anti-spam reasons.")
 
 
 __all__ = [
     create_session, is_username_available, is_email_available, is_email_verified,
-    get_profile, create_account
+    get_profile
     ] # shared by module
