@@ -28,6 +28,7 @@ from modules.classes import *
 ## Attachments in general
 ## Profiles
 # adjust profile
+## Make everything refreshable
 
 ## Library ##
 bot_sessions = {}
@@ -308,7 +309,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    def get_groups(self) -> dict[Contact]:
+    def get_groups(self) -> dict[Group]:
         token = bot_sessions[self].token
         if token:
             data = {
@@ -331,8 +332,39 @@ class Bot():
                 data = response.json()['json']
                 collection = {}
                 for item in data:
-                    collection[item.get('title') or "<unknown>"] = Group(api_response=item)
+                    collection[item.get('title') or "<unknown>"] = Group(bot_sessions[self], api_response=item)
                 return collection
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return {}
+        
+    def get_group(self, title: str) -> Group | None:
+        if not check_type(title, str, 2): return
+
+        token = bot_sessions[self].token
+        if token:
+            data = {
+                "auth": bot_sessions[self].token,
+                "method": "get",
+                "endpoint": "group",
+                "data": {}
+            }
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason') or "<no reason provided>"
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                return {}
+            else:
+                data = response.json()['json']
+                for item in data:
+                    if item.get('title').lower() == title.lower():
+                        return Group(bot_sessions[self], api_response=item)
         else:
             show_message(
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")

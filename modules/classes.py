@@ -7,115 +7,105 @@ from modules.functions import *
 # Note that type checking usually isn't needed in class __init__
 class Session(): # bot session
     def __init__(self, username: str, password: str):
-        self.username = username
-        self.password = password
-        self.event_registry = {}
-        self.command_registry = {}
-        self.token = None
+        self.username: str = username
+        self.password: str = password
+        self.event_registry: dict = {}
+        self.command_registry: dict = {}
+        self.token: str = None
 
 class ProfileConnection():
     def __init__(self, key: str, username: str, url: str):
-        self.platform = key
-        self.username = username
-        self.url = url
+        self.platform: str = key
+        self.username: str = username
+        self.url: str = url
 
 class Trophy():
     def __init__(self, background: str, description: str, foreground: str, title: str):
-        self.background_url = f"{url}{background}"
-        self.description = description
-        self.foreground = f"{url}{foreground}"
-        self.title = title
-
-def build_profile(self, username: str = None, userid: int = None, api_response: dict = None):
-    if not api_response:
-        data = {
-            "auth": None,
-            "method": "get",
-            "endpoint": "profile",
-            "data": {}
-        }
-
-        if username:
-            data["data"] = {"user": username}
-        else:
-            data["data"] = {"userId": userid}
-
-        success, response = server_request(type="post", data=data)
-        if not success:
-            reason = "<response isn't in json>"
-            try:
-                reason = response.json().get('reason')
-            except Exception as e:
-                reason = f"<json parsing error: {e}>"
-            show_message(
-                f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
-        
-            self._success = False
-            return
-        else:
-            api_response = response.json()['json']
-
-    if api_response.get('error'):
-        self._success = False
-        return
-
-    self.banner_id = api_response.get('banner')
-    self.description = api_response.get('description')
-    self.followers = api_response.get('followers')
-    self.follows = api_response.get('follows')
-    self.friend_status = api_response.get('follow')
-    self.id = api_response.get('id')
-    self.likes = api_response.get('likes')
-    self.made_unix = api_response.get('made')
-    self.online_unix = api_response.get('online')
-    self.picture_id = api_response.get('picture')
-    self.status = api_response.get('status')
-    self.unseen_dms = api_response.get('unseen')
-    self.user = api_response.get('user')
-    self.verified = api_response.get('verified')
-
-    self.banner_url = f"{url}/uploads/{self.banner_id}"
-    self.following = self.friend_status != "none"
-    self.made = datetime.fromtimestamp(self.made_unix or 0)
-    self.online = datetime.fromtimestamp(self.online_unix or 0)
-    self.picture_url = f"{url}/uploads/{self.picture_id}"
-    self.url = f"https://chat.jonazwetsloot.nl/users/{self.user}"
-    self.username = self.user
-
-    connections = {}
-    collection = api_response.get('connections')
-    if isinstance(collection, dict):
-        for key, item in collection.items():
-            connections[key] = ProfileConnection(key, item['username'], item['url'])
-    self.connections = connections
-
-    trophies = []
-    for trophy in api_response.get('trophies'):
-        trophies.append(Trophy(trophy.get('background'), trophy.get('description'), trophy.get('foreground'), trophy.get('title')))
-    self.trophies = trophies
-
-    self._success = True
+        self.background_url: str = f"{url}{background}"
+        self.description: str = description
+        self.foreground: str = f"{url}{foreground}"
+        self.title: str = title
 
 class Profile():
     def __init__(self, username: str = None, userid: int = None, api_response: dict = None):
+        self._success: bool = False
         if not username and not api_response and not userid:
-            self._success = False
             return
         
-        if username:
-            build_profile(self, username=username)
-        elif userid:
-            build_profile(self, userid=userid)
-        else:
-            build_profile(self, api_response=api_response)
+        if not api_response:
+            data = {
+                "auth": None,
+                "method": "get",
+                "endpoint": "profile",
+                "data": {}
+            }
+
+            if username:
+                data["data"] = {"user": username}
+            else:
+                data["data"] = {"userId": userid}
+
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason')
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+        
+                return
+            else:
+                api_response = response.json()['json']
+
+        if api_response.get('error'):
+            return
+
+        self.banner_id: str = api_response.get('banner')
+        self.description: str = api_response.get('description')
+        self.followers: int = api_response.get('followers')
+        self.follows: int = api_response.get('follows')
+        self.friend_status: str = api_response.get('follow')
+        self.id: int = api_response.get('id')
+        self.likes: int = api_response.get('likes')
+        self.made_unix: int = api_response.get('made')
+        self.online_unix: int = api_response.get('online')
+        self.picture_id: str = api_response.get('picture')
+        self.status: str = api_response.get('status')
+        self.unseen_dms: int = api_response.get('unseen')
+        self.user: str = api_response.get('user')
+        self.verified: bool = api_response.get('verified')
+
+        self.banner_url: str = f"{url}/uploads/{self.banner_id}"
+        self.following: bool = self.friend_status != "none"
+        self.made: datetime = datetime.fromtimestamp(self.made_unix or 0)
+        self.online: datetime = datetime.fromtimestamp(self.online_unix or 0)
+        self.picture_url: str = f"{url}/uploads/{self.picture_id}"
+        self.url: str = f"https://chat.jonazwetsloot.nl/users/{self.user}"
+        self.username: str = self.user
+
+        connections = {}
+        collection = api_response.get('connections')
+        if isinstance(collection, dict):
+            for key, item in collection.items():
+                connections[key] = ProfileConnection(key, item['username'], item['url'])
+        self.connections: dict[ProfileConnection] = connections
+
+        trophies = []
+        for trophy in api_response.get('trophies'):
+            trophies.append(Trophy(trophy.get('background'), trophy.get('description'), trophy.get('foreground'), trophy.get('title')))
+        self.trophies: dict[Trophy] = trophies
+
+        self._success: bool = True
 
     def refresh(self):
-        return build_profile(self, self.user)._success
-    
+        return Profile(userid=self.id)
+
 class Contact():
     def __init__(self, username: str = None, api_response: dict = None):
+        self._success: bool = False
         if not username and not api_response:
-            self._success = False
             return
         
         if not api_response:
@@ -136,7 +126,6 @@ class Contact():
                     show_message(
                         f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
         
-                self._success = False
                 return
             else:
                 data = response.json()['json']
@@ -145,61 +134,64 @@ class Contact():
                         api_response = item
                 
         if not api_response or api_response.get('error'):
-            self._success = False
             return
 
-        self.added = api_response.get('added')
-        self.banner_id = api_response.get('banner')
-        self.description = api_response.get('description')
-        self.followers = api_response.get('followers')
-        self.follows = api_response.get('follows')
-        self.friend_status = api_response.get('follow')
-        self.id = api_response.get('url')
+        self.added_unix: int = api_response.get('added')
+        self.banner_id: str = api_response.get('banner')
+        self.description: str = api_response.get('description')
+        self.followers: int = api_response.get('followers')
+        self.follows: int = api_response.get('follows')
+        self.friend_status: str = api_response.get('follow')
+        self.id: int = api_response.get('url')
         # there is api_response.get('last_message') for if a DMMessage object gets added
-        self.likes = api_response.get('likes')
-        self.made_unix = api_response.get('made')
-        self.online_unix = api_response.get('online')
-        self.picture_id = api_response.get('picture')
-        self.status = api_response.get('status')
-        self.unseen_dms = api_response.get('unseen')
-        self.user = api_response.get('user')
-        self.verified = api_response.get('verified')
+        self.likes: int = api_response.get('likes')
+        self.made_unix: int = api_response.get('made')
+        self.online_unix: int = api_response.get('online')
+        self.picture_id: str = api_response.get('picture')
+        self.status: str = api_response.get('status')
+        self.unseen_dms: int = api_response.get('unseen')
+        self.user: str = api_response.get('user')
+        self.verified: bool = api_response.get('verified')
 
-        self.banner_url = f"{url}/uploads/{self.banner_id}"
-        self.following = self.friend_status != "none"
-        self.made = datetime.fromtimestamp(self.made_unix or 0)
-        self.online = datetime.fromtimestamp(self.online_unix or 0)
-        self.picture_url = f"{url}/uploads/{self.picture_id}"
-        self.url = f"https://chat.jonazwetsloot.nl/users/{self.user}"
-        self.username = self.user
+        self.banner_url: str = f"{url}/uploads/{self.banner_id}"
+        self.following: bool = self.friend_status != "none"
+        self.added: datetime = datetime.fromtimestamp(self.added_unix or 0)
+        self.made: datetime = datetime.fromtimestamp(self.made_unix or 0)
+        self.online: datetime = datetime.fromtimestamp(self.online_unix or 0)
+        self.picture_url: str = f"{url}/uploads/{self.picture_id}"
+        self.url: str = f"https://chat.jonazwetsloot.nl/users/{self.user}"
+        self.username: str = self.user
 
         connections = {}
         collection = api_response.get('connections')
         if isinstance(collection, dict):
             for key, item in collection.items():
                 connections[key] = ProfileConnection(key, item['username'], item['url'])
-        self.connections = connections
+        self.connections: dict[ProfileConnection] = connections
 
-        self._success = True
+        self._success: bool = True
 
 class Channel():
-    def __init__(self, category, api_response: dict):
-        self.category = category
-        self.id = api_response.get('id')
-        self.name = api_response.get('name')
-        self.type = api_response.get('type')
+    def __init__(self, session, group, category, api_response: dict):
+        self.session: Session = session
+        self.category: Category = category
+        self.group: Group = group
+        self.id: int = api_response.get('id')
+        self.name: str = api_response.get('name')
+        self.type: str = api_response.get('type')
 
     def send_message(self, message: str) -> tuple[bool, int]:
         if not check_type(message, str, 2): return
-        bot_sessions = {} # silence, fix later
 
-        token = bot_sessions[self].token
+        token = self.session.token
         if token:
             data = {
-                "auth": bot_sessions[self].token,
+                "auth": self.session.token,
                 "method": "post",
                 "endpoint": "group-message",
                 "data": {
+                    "id": self.group.id,
+                    "channel": self.name,
                     "message": message
                 }
             }
@@ -222,12 +214,13 @@ class Channel():
             return False, None
  
 class Category():
-    def __init__(self, group, name: str, api_response: dict):
-        self.name = name
-        self.group = group
-        self.channels = {}
+    def __init__(self, session, group, name: str, api_response: dict):
+        self.session: Session = session
+        self.name: str = name
+        self.group: Group = group
+        self.channels: dict[Channel] = {}
         for channel in api_response:
-            self.channels[channel.get('name') or "<unknown>"] = Channel(self, channel)
+            self.channels[channel.get('name') or "<unknown>"] = Channel(session, self.group, self, channel)
 
     def get_channel(self, name: str) -> Channel | None:
         if not check_type(name, str, 2): return
@@ -236,9 +229,10 @@ class Category():
                 return channel
 
 class Group():
-    def __init__(self, title: str = None, api_response: dict = None):
+    def __init__(self, session, title: str = None, api_response: dict = None):
+        self.session: Session = session
+        self._success: bool = False
         if not title and not api_response:
-            self._success = False
             return
         
         if not api_response:
@@ -259,7 +253,6 @@ class Group():
                     show_message(
                         f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
         
-                self._success = False
                 return
             else:
                 data = response.json()['json']
@@ -268,28 +261,77 @@ class Group():
                         api_response = item
                 
         if not api_response or api_response.get('error'):
-            self._success = False
             return
         
-        self.admin_ids = api_response.get('admins')
+        self.admin_ids: dict[int] = api_response.get('admins')
         # add a .get_admins() function that returns as Profile objects
-        self.description = api_response.get('description')
-        self.icon_id = api_response.get('icon')
-        self.id = api_response.get('id')
+        self.description: str = api_response.get('description')
+        self.icon_id: str = api_response.get('icon')
+        self.id: int = api_response.get('id')
         # there is api_response.get('last_message') for if a DMMessage object gets added
-        self.title = api_response.get('title')
-        self.user_ids = api_response.get('user_ids')
+        self.title: str = api_response.get('title')
+        self.user_ids: dict[int] = api_response.get('user_ids')
         # add a .get_members() function that returns as Profile objects
 
-        self.categories = {}
+        self.categories: dict[Category] = {}
         for category, data in api_response.get('channels').items():
-            self.categories[category] = Category(self, category, data)
+            self.categories[category] = Category(session, self, category, data)
 
-        self.icon_url = f"https://chat.jonazwetsloot.nl/uploads/{self.icon_id}"
-        self.name = self.title
+        self.icon_url: str = f"https://chat.jonazwetsloot.nl/uploads/{self.icon_id}"
+        self.name: str = self.title
 
-        self._success = True
+        self._success: bool = True
+
+    def get_admins(self) -> list[Profile]:
+        admins = []
+        for id in self.admin_ids:
+            admins.append(Profile(userid=id))
+        return admins
+    
+    def get_members(self) -> list[Profile]:
+        members = []
+        for id in self.user_ids:
+            members.append(Profile(userid=id))
+        return members
+
+    def get_category(self, name: str) -> Category | None:
+        if not check_type(name, str, 2): return
+        for cname, category in self.categories.items():
+            if cname.lower() == name.lower():
+                return category
 
     def is_admin(self, user: Profile) -> bool:
         if not check_type(user, Profile, 2): return
         return user.id in self.admin_ids
+    
+    def send_message(self, message: str) -> tuple[bool, int]:
+        if not check_type(message, str, 2): return
+
+        token = self.session.token
+        if token:
+            data = {
+                "auth": self.session.token,
+                "method": "post",
+                "endpoint": "group-message",
+                "data": {
+                    "id": self.id,
+                    "message": message
+                }
+            }
+            success, response = server_request(type="post", data=data)
+            if not success:
+                reason = "<response isn't in json>"
+                try:
+                    reason = response.json().get('reason') or "<no reason provided>"
+                except Exception as e:
+                    reason = f"<json parsing error: {e}>"
+                show_message(
+                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                return False, None
+            else:
+                data = response.json()['json']
+                return data.get('error') == None, data.get('id')
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return False, None

@@ -6,10 +6,8 @@ bot = selfbot.create_session('Bjarnos', os.getenv("PASSWORD"))
 
 @bot.event
 async def on_ready():
-    groups = bot.get_groups()
-    user = selfbot.get_profile("JonaZwetsloot")
-    for title, item in groups.items():
-        if item.is_admin(user):
-            print(item.title)
+    group = bot.get_group("Cats")
+    if group:
+        print(group.send_message("test2"))
 
 bot.run()
