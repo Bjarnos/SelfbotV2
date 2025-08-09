@@ -243,7 +243,7 @@ class Bot():
         if profile._success != False:
             return profile
         
-    async def add_contact(self, user: str) -> bool:
+    async def follow(self, user: str) -> bool:
         if not check_type(user, str, 2): return
 
         token = bot_sessions[self].token
@@ -274,7 +274,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    async def delete_contact(self, user: str) -> bool:
+    async def unfollow(self, user: str) -> bool:
         if not check_type(user, str, 2): return
 
         token = bot_sessions[self].token
