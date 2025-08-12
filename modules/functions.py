@@ -4,7 +4,7 @@ from modules.globals import *
 requests_cache.install_cache("http_cache", expire_after=60, allowable_methods=["GET"]) # 1 minute requests cache
 
 ## Shared ##
-def show_message(message: str = None, mtype: str = "Standard"):
+def show_message(message: str = None, mtype: str = "Standard") -> None:
     if not check_type(message, str, 1, True): return
     if not check_type(mtype, str, 2, True): return
 
@@ -18,7 +18,7 @@ def show_message(message: str = None, mtype: str = "Standard"):
         show_message(f"Ignored show_message due to invalid mtype ('{mtype}')")
 
 
-def check_type(value, class_, argnumber: int, internal: bool = True):
+def check_type(value, class_, argnumber: int, internal: bool = True) -> bool:
     #if not check_type(argnumber, int, 3, True): return
     #if not check_type(internal, bool, 4, True): return
 
@@ -61,10 +61,10 @@ def check_type(value, class_, argnumber: int, internal: bool = True):
     return True
     
 
-def server_request(type: str = "get", url: str = server_question, data: dict = {}):
-    if not check_type(type, str, 1, True): return
-    if not check_type(url, str, 2, True): return
-    if not check_type(data, dict, 3, True): return
+def server_request(type: str = "get", url: str = server_question, data: dict = {}) -> tuple[bool, requests.models.Response|None]:
+    if not check_type(type, str, 1, True): return False, None
+    if not check_type(url, str, 2, True): return False, None
+    if not check_type(data, dict, 3, True): return False, None
 
     if not url:
         show_message(

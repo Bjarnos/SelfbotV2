@@ -45,8 +45,8 @@ class Bot():
         bot_sessions[self] = Session(user, password)
 
     # Standard methods
-    async def send_message(self, message: str) -> tuple[bool, int]:
-        if not check_type(message, str, 2): return
+    async def send_message(self, message: str) -> tuple[bool, int | None]:
+        if not check_type(message, str, 2): return False, None
 
         token = bot_sessions[self].token
         if token:
@@ -76,9 +76,9 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False, None
         
-    async def send_reaction(self, id: int, message: str) -> tuple[bool, int]:
-        if not check_type(id, int, 2): return
-        if not check_type(message, str, 3): return
+    async def send_reaction(self, id: int, message: str) -> tuple[bool, int | None]:
+        if not check_type(id, int, 2): return False, None
+        if not check_type(message, str, 3): return False, None
 
         token = bot_sessions[self].token
         if token:
@@ -110,7 +110,7 @@ class Bot():
             return False, None
         
     async def delete_message(self, id: int) -> bool:
-        if not check_type(id, int, 2): return
+        if not check_type(id, int, 2): return False
 
         token = bot_sessions[self].token
         if token:
@@ -141,8 +141,8 @@ class Bot():
             return False
         
     async def like_message(self, id: int, unlike: bool = False) -> bool:
-        if not check_type(id, int, 2): return
-        if not check_type(unlike, bool, 3): return
+        if not check_type(id, int, 2): return False
+        if not check_type(unlike, bool, 3): return False
 
         token = bot_sessions[self].token
         if token:
@@ -174,8 +174,8 @@ class Bot():
             return False
         
     async def edit_message(self, id: int, message: str) -> bool:
-        if not check_type(id, int, 2): return
-        if not check_type(message, str, 3): return
+        if not check_type(id, int, 2): return False
+        if not check_type(message, str, 3): return False
 
         token = bot_sessions[self].token
         if token:
@@ -206,7 +206,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    async def get_contacts(self) -> dict[Contact]:
+    async def get_contacts(self) -> dict[str, Contact]:
         token = bot_sessions[self].token
         if token:
             data = {
@@ -244,7 +244,7 @@ class Bot():
             return profile
         
     async def follow(self, user: str) -> bool:
-        if not check_type(user, str, 2): return
+        if not check_type(user, str, 2): return False
 
         token = bot_sessions[self].token
         if token:
@@ -275,7 +275,7 @@ class Bot():
             return False
         
     async def unfollow(self, user: str) -> bool:
-        if not check_type(user, str, 2): return
+        if not check_type(user, str, 2): return False
 
         token = bot_sessions[self].token
         if token:
@@ -305,9 +305,9 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    async def send_dm(self, user: str, message: str) -> tuple[bool, int]:
-        if not check_type(user, str, 2): return
-        if not check_type(message, str, 3): return
+    async def send_dm(self, user: str, message: str) -> tuple[bool, int | None]:
+        if not check_type(user, str, 2): return False, None
+        if not check_type(message, str, 3): return False, None
 
         token = bot_sessions[self].token
         if token:
@@ -339,7 +339,7 @@ class Bot():
             return False, None
         
     async def delete_dm(self, id: int) -> bool:
-        if not check_type(id, int, 2): return
+        if not check_type(id, int, 2): return False
 
         token = bot_sessions[self].token
         if token:
@@ -369,9 +369,9 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    async def edit_dm(self, id: int, message: str) -> tuple[bool, int]:
-        if not check_type(id, int, 2): return
-        if not check_type(message, str, 3): return
+    async def edit_dm(self, id: int, message: str) -> bool:
+        if not check_type(id, int, 2): return False
+        if not check_type(message, str, 3): return False
 
         token = bot_sessions[self].token
         if token:
@@ -402,38 +402,7 @@ class Bot():
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
             return False
         
-    async def delete_dm(self, id: int) -> bool:
-        if not check_type(id, int, 2): return
-
-        token = bot_sessions[self].token
-        if token:
-            data = {
-                "auth": bot_sessions[self].token,
-                "method": "delete",
-                "endpoint": "group-message",
-                "data": {
-                    "id": id
-                }
-            }
-            success, response = server_request(type="post", data=data)
-            if not success:
-                reason = "<response isn't in json>"
-                try:
-                    reason = response.json().get('reason') or "<no reason provided>"
-                except Exception as e:
-                    reason = f"<json parsing error: {e}>"
-                show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
-                return False
-            else:
-                data = response.json()['json']
-                return data.get('error') == None
-        else:
-            show_message(
-                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
-            return False
-        
-    async def get_groups(self) -> dict[Group]:
+    async def get_groups(self) -> dict[str, Group]:
         token = bot_sessions[self].token
         if token:
             data = {
@@ -483,7 +452,7 @@ class Bot():
                     reason = f"<json parsing error: {e}>"
                 show_message(
                     f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
-                return {}
+                return
             else:
                 data = response.json()['json']
                 for item in data:
@@ -492,28 +461,28 @@ class Bot():
         else:
             show_message(
                 f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
-            return {}
+            return
         
     # @ methods
     def event(self, func: function) -> function:
-        if not check_type(func, function, 2): return
+        if not check_type(func, function, 2): return func
         if not inspect.iscoroutinefunction(func):
             show_message("@bot.event must be an async function!", "Error")
-            return
+            return func
 
         bot_session = bot_sessions.get(self)
-        if not bot_session: return # creating bot had an error
+        if not bot_session: return func # creating bot had an error
 
         allowed = ["on_ready"]
         event_name = func.__name__
         if event_name not in allowed:
             show_message(
                 f"{event_name} is not a valid event for @bot.event!", "Error")
-            return
+            return func
 
         if not callable(func):
             show_message("@bot.event should get a function passed!", "Error")
-            return
+            return func
 
         bot_session.event_registry[event_name] = func
         return func
@@ -530,7 +499,7 @@ class Bot():
     def run(self) -> bool:
         # Gather session
         bot_session = bot_sessions.get(self)
-        if not bot_session: return # creating bot had an error
+        if not bot_session: return False # creating bot had an error
 
         username = bot_session.username
         password = bot_session.password
@@ -553,7 +522,7 @@ class Bot():
             verifier = verifier.get('value')
         else:
             show_message("Couldn't find login verifier.\n Usually, this means your login info is incorrect.", "Error")
-            return
+            return False
 
         data = {
             'response_type': 'code',
@@ -575,12 +544,12 @@ class Bot():
             token = response.json().get('token')
             if not token:
                 show_message("Server didn't return token!", "Error")
-                return
+                return False
 
             bot_session.token = token
         else:
             show_message("Server had an error.", "Error")
-            return
+            return False
         
         # Set user attribute
         self.user = get_profile(username) # don't forget to refresh often when using :)
@@ -594,14 +563,14 @@ class Bot():
 
 
 ## Main ##
-def create_session(username: str, password: str) -> Bot:
+def create_session(username: str, password: str) -> Bot | None:
     if not check_type(username, str, 1): return
     if not check_type(password, str, 2): return
     return Bot(username, password)
 
 
 ## Public methods ##
-async def is_username_available(username: str) -> bool:
+async def is_username_available(username: str) -> bool | None:
     if not check_type(username, str, 1): return
     data = {
         "auth": None,
@@ -624,7 +593,7 @@ async def is_username_available(username: str) -> bool:
         data = response.json()['json']
         return data.get('available')
     
-async def is_email_available(email: str) -> bool:
+async def is_email_available(email: str) -> bool | None:
     if not check_type(email, str, 1): return
 
     data = {
@@ -648,7 +617,7 @@ async def is_email_available(email: str) -> bool:
         data = response.json()['json']
         return data.get('valid') and data.get('available')
     
-async def is_email_verified(user: str) -> bool:
+async def is_email_verified(user: str) -> bool | None:
     if not check_type(user, str, 1): return
 
     data = {

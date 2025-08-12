@@ -11,7 +11,7 @@ class Session(): # bot session
         self.password: str = password
         self.event_registry: dict = {}
         self.command_registry: dict = {}
-        self.token: str = None
+        self.token: str = ""
 
 class ProfileConnection():
     def __init__(self, key: str, username: str, url: str):
@@ -90,12 +90,12 @@ class Profile():
         if isinstance(collection, dict):
             for key, item in collection.items():
                 connections[key] = ProfileConnection(key, item['username'], item['url'])
-        self.connections: dict[ProfileConnection] = connections
+        self.connections: dict[str, ProfileConnection] = connections
 
         trophies = []
         for trophy in api_response.get('trophies'):
             trophies.append(Trophy(trophy.get('background'), trophy.get('description'), trophy.get('foreground'), trophy.get('title')))
-        self.trophies: dict[Trophy] = trophies
+        self.trophies: list[Trophy] = trophies
 
         self._success: bool = True
 
@@ -167,7 +167,7 @@ class Contact():
         if isinstance(collection, dict):
             for key, item in collection.items():
                 connections[key] = ProfileConnection(key, item['username'], item['url'])
-        self.connections: dict[ProfileConnection] = connections
+        self.connections: dict[str, ProfileConnection] = connections
 
         self._success: bool = True
 
@@ -180,8 +180,8 @@ class Channel():
         self.name: str = api_response.get('name')
         self.type: str = api_response.get('type')
 
-    async def send_message(self, message: str) -> tuple[bool, int]:
-        if not check_type(message, str, 2): return
+    async def send_message(self, message: str) -> tuple[bool, int|None]:
+        if not check_type(message, str, 2): return False, None
 
         token = self.session.token
         if token:
@@ -218,7 +218,7 @@ class Category():
         self.session: Session = session
         self.name: str = name
         self.group: Group = group
-        self.channels: dict[Channel] = {}
+        self.channels: dict[str, Channel] = {}
         for channel in api_response:
             self.channels[channel.get('name') or "<unknown>"] = Channel(session, self.group, self, channel)
 
@@ -263,17 +263,17 @@ class Group():
         if not api_response or api_response.get('error'):
             return
         
-        self.admin_ids: dict[int] = api_response.get('admins')
+        self.admin_ids: list[int] = api_response.get('admins')
         # add a .get_admins() function that returns as Profile objects
         self.description: str = api_response.get('description')
         self.icon_id: str = api_response.get('icon')
         self.id: int = api_response.get('id')
         # there is api_response.get('last_message') for if a DMMessage object gets added
         self.title: str = api_response.get('title')
-        self.user_ids: dict[int] = api_response.get('user_ids')
+        self.user_ids: list[int] = api_response.get('user_ids')
         # add a .get_members() function that returns as Profile objects
 
-        self.categories: dict[Category] = {}
+        self.categories: dict[str, Category] = {}
         for category, data in api_response.get('channels').items():
             self.categories[category] = Category(session, self, category, data)
 
@@ -300,12 +300,12 @@ class Group():
             if cname.lower() == name.lower():
                 return category
 
-    def is_admin(self, user: Profile) -> bool:
+    def is_admin(self, user: Profile) -> bool | None:
         if not check_type(user, Profile, 2): return
         return user.id in self.admin_ids
     
-    async def send_message(self, message: str) -> tuple[bool, int]:
-        if not check_type(message, str, 2): return
+    async def send_message(self, message: str) -> tuple[bool, int | None]:
+        if not check_type(message, str, 2): return False, None
 
         token = self.session.token
         if token:

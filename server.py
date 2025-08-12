@@ -1,5 +1,15 @@
+# pyright: reportOptionalMemberAccess=false
+"""
+
+This is the server of SelfbotV2. It's not recommended to host this as well when creating a fork of Selfbot, but if you do:
+- Replace `server` in modules\\globals with your new server ip/link.
+- Ask the owner of Chat (Jona) if he can add a POST in api/<version>/group-message to your server/new with new message's content,
+  or create a redirect to my server which will already has that implemented.
+
+"""
+
 # Test stuff
-import os, subprocess, threading, time, sys
+import os, subprocess, threading, sys
 def run_test_script():
     time.sleep(2)
     print("Starting test.py!")
@@ -22,7 +32,7 @@ access_token = os.getenv("ACCESS_TOKEN")
 connected_clients = {}
 
 # Methods
-def get_token(auth):
+def get_token(auth: str) -> str|None:
     # add auto refresh later
     collection = connected_clients.get(auth)
     if collection:
@@ -31,6 +41,7 @@ def get_token(auth):
 # Endpoints
 @app.route("/c", methods=["POST"])
 def connect():
+    # This endpoint is used by selfbots to connect with the server
     token = request.form.get('token')
     if token:
         if token.__class__ != str:
@@ -72,6 +83,52 @@ def connect():
 allowed_methods = ["post", "get", "put", "delete"]
 @app.route("/r", methods=["POST"])
 def incoming_request():
+    # This endpoint is used by selfbots to make requests to the Chat API
+    data = request.get_json(silent=False)
+    if not isinstance(data, dict):
+        return jsonify(success=False, reason="Data must be valid json!"), 400
+    
+    auth = data.get('auth')
+    method = data.get('method')
+    endpoint = data.get('endpoint')
+    data = data.get('data')
+    if auth.__class__ != str and auth != None:
+        return jsonify(success=False, reason=f"'auth' must be a string or null!"), 400
+    if method.__class__ != str:
+        return jsonify(success=False, reason=f"'method' must be a string!"), 400
+    if endpoint.__class__ != str:
+        return jsonify(success=False, reason=f"'endpoint' must be a string!"), 400
+    if data.__class__ != dict:
+        return jsonify(success=False, reason=f"'data' must be a dict!"), 400
+
+    method = method.lower()
+    if method not in allowed_methods:
+        return jsonify(success=False, reason=f"Method must be in {allowed_methods} (case insensitive)!"), 400
+        
+    token = auth and get_token(auth) or access_token
+    if token:
+        full_url = f"{api_url}/{endpoint}"
+        method = getattr(requests, method.lower())
+        response = None
+        if method == requests.get:
+            response = method(full_url, params=data, headers={"Authorization":f"Bearer {token}"})
+        else:
+            response = method(full_url, data=data, headers={"Authorization":f"Bearer {token}"})
+
+        if response.status_code < 400:
+            try:
+                return jsonify(success=True, json=response.json()), 200
+            except ValueError:
+                return jsonify(success=False, reason="Response wasn't in json"), 400
+        else:
+            return jsonify(success=False, reason="Endpoint failed (is your token correct and not expired?). " \
+            "This may be an internal error"), 500
+    else:
+        return jsonify(success=False, reason="Invalid auth"), 401
+    
+@app.route("/new", methods=["POST"])
+def new_message():
+    # This endpoint is used internally by Chat for new group messages
     data = request.get_json(silent=False)
     if not isinstance(data, dict):
         return jsonify(success=False, reason="Data must be valid json!"), 400

@@ -9,3 +9,4 @@ reversed/
 *.lua
 selfbotv1.py
 user_client.py
+pyrightconfig.json
