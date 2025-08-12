@@ -149,6 +149,7 @@ def incoming_request():
 @app.route("/new", methods=["POST"])
 def new_message():
     # This endpoint is used internally by Chat for new group messages
+    # This endpoint will be rewritten soon
     auth = request.headers.get('Authorization')
     if auth.__class__ != str:
         return jsonify(success=False, reason=f"Authorization header must be a string!"), 400

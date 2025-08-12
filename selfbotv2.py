@@ -657,7 +657,7 @@ async def get_profile(user: int|str) -> Profile | None:
             return profile
 
 
-__all__ = [
+export = [
     create_session, is_username_available, is_email_available, is_email_verified,
     get_profile
     ] # shared by module

@@ -9,6 +9,7 @@ pyrightconfig.json
 
 reversed/
 *.sqlite
+*.db
 *.lua
 selfbotv1.py
 user_client.py
