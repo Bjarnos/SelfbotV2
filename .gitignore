@@ -5,6 +5,7 @@ __pycache__/
 *.env
 
 reversed/
-http_cache.sqlite
+*.sqlite
+*.lua
 selfbotv1.py
 user_client.py
