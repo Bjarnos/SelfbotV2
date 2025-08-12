@@ -1,4 +1,3 @@
-# pyright: reportOptionalMemberAccess=false
 """
 
 This is the server of SelfbotV2. It's not recommended to host this as well when creating a fork of Selfbot, but if you do:
@@ -17,7 +16,8 @@ def run_test_script():
     subprocess.Popen([sys.executable, "test.py"], cwd=script_dir)
 
 # Server
-import requests, random, string, time, requests_cache, dotenv
+import requests, random, string, time, requests_cache, dotenv, sqlite3, json
+from threading import Lock
 from flask import Flask, request, jsonify
 from modules.globals import *
 
@@ -28,8 +28,28 @@ app = Flask(__name__)
 
 secret = os.getenv("SECRET")
 access_token = os.getenv("ACCESS_TOKEN")
+chat_token = os.getenv("CHAT_TOKEN") # token used by Jona to verify requests coming from chat
 
 connected_clients = {}
+
+class Datastore:
+    def __init__(self, db_path='local.db'):
+        self.conn = sqlite3.connect(db_path, check_same_thread=False, isolation_level=None)
+        self.lock = Lock()
+        self.conn.execute('PRAGMA journal_mode=WAL')
+        self.conn.execute('CREATE TABLE IF NOT EXISTS data (id TEXT PRIMARY KEY, value TEXT)')
+
+    def read(self, id_):
+        with self.lock:
+            cursor = self.conn.execute('SELECT value FROM data WHERE id = ?', (id_,))
+            row = cursor.fetchone()
+            return row[0] if row else None
+
+    def write(self, id_, value):
+        with self.lock:
+            self.conn.execute('INSERT OR REPLACE INTO data (id, value) VALUES (?, ?)', (id_, value))
+
+datastore = Datastore()
 
 # Methods
 def get_token(auth: str) -> str|None:
@@ -129,47 +149,27 @@ def incoming_request():
 @app.route("/new", methods=["POST"])
 def new_message():
     # This endpoint is used internally by Chat for new group messages
+    auth = request.headers.get('Authorization')
+    if auth.__class__ != str:
+        return jsonify(success=False, reason=f"Authorization header must be a string!"), 400
+    
+    if auth != f"Bearer {chat_token}":
+        return jsonify(success=False, reason=f"Authorization header is incorrect!"), 400
+
     data = request.get_json(silent=False)
     if not isinstance(data, dict):
         return jsonify(success=False, reason="Data must be valid json!"), 400
     
-    auth = data.get('auth')
-    method = data.get('method')
-    endpoint = data.get('endpoint')
     data = data.get('data')
-    if auth.__class__ != str and auth != None:
-        return jsonify(success=False, reason=f"'auth' must be a string or null!"), 400
-    if method.__class__ != str:
-        return jsonify(success=False, reason=f"'method' must be a string!"), 400
-    if endpoint.__class__ != str:
-        return jsonify(success=False, reason=f"'endpoint' must be a string!"), 400
     if data.__class__ != dict:
         return jsonify(success=False, reason=f"'data' must be a dict!"), 400
-
-    method = method.lower()
-    if method not in allowed_methods:
-        return jsonify(success=False, reason=f"Method must be in {allowed_methods} (case insensitive)!"), 400
         
-    token = auth and get_token(auth) or access_token
-    if token:
-        full_url = f"{api_url}/{endpoint}"
-        method = getattr(requests, method.lower())
-        response = None
-        if method == requests.get:
-            response = method(full_url, params=data, headers={"Authorization":f"Bearer {token}"})
-        else:
-            response = method(full_url, data=data, headers={"Authorization":f"Bearer {token}"})
+    id_ = data.get('id')
+    if not isinstance(id_, str): # I will replace everything with isinstance instead of __class__ later
+        return jsonify(success=False, reason="'id' must be a string in data!"), 400
+    datastore.write(id_, json.dumps(data))
 
-        if response.status_code < 400:
-            try:
-                return jsonify(success=True, json=response.json()), 200
-            except ValueError:
-                return jsonify(success=False, reason="Response wasn't in json"), 400
-        else:
-            return jsonify(success=False, reason="Endpoint failed (is your token correct and not expired?). " \
-            "This may be an internal error"), 500
-    else:
-        return jsonify(success=False, reason="Invalid auth"), 401
+    return jsonify(success=True)
 
 if __name__ == "__main__":
     threading.Thread(target=run_test_script, daemon=True).start()
