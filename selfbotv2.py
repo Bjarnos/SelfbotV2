@@ -590,7 +590,7 @@ class Bot():
             asyncio.run(onr())
 
         # Keep alive
-        threading.Thread(target=keep_alive, args=(bot_session)).start()
+        threading.Thread(target=keep_alive, args=(bot_session,)).start()
 
         return True
     
