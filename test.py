@@ -7,6 +7,6 @@ bot = selfbot.create_session('Bjarnos', os.getenv("PASSWORD"))
 
 @bot.event
 async def on_ready():
-    print(await bot.send_dm("Bjarnos", "test"))
+    print((await bot.user()).username)
 
 bot.run()

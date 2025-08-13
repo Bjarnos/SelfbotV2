@@ -45,6 +45,16 @@ class Bot():
         bot_sessions[self] = Session(user, password)
 
     # Standard methods
+    async def user(self):
+        bot_session = bot_sessions[self]
+        token = bot_session.token
+        if token:
+            return await get_profile(bot_session.username)
+        else:
+            show_message(
+                f"Can't use .{inspect.currentframe().f_code.co_name}() before .run()!", "Error")
+            return False, None        
+
     async def send_message(self, message: str) -> tuple[bool, int | None]:
         if not check_type(message, str, 2): return False, None
 
@@ -550,9 +560,6 @@ class Bot():
         else:
             show_message("Server had an error.", "Error")
             return False
-        
-        # Set user attribute
-        self.user = get_profile(username) # don't forget to refresh often when using :)
 
         # Run the on_ready event
         onr = bot_session.event_registry.get('on_ready')
