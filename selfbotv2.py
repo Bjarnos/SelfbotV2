@@ -1,5 +1,5 @@
 ## Imports ##
-import asyncio, inspect
+import threading, time, asyncio, inspect
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -34,6 +34,14 @@ from modules.classes import *
 bot_sessions = {}
 def f(): pass
 function = f.__class__
+
+def keep_alive(bot_session):
+    auth = bot_session.token
+    while True:
+        if bot_session.kill: return
+        data = {'auth': auth}
+        requests.post(url=server_activity, data=data)
+        time.sleep(3600)
 
 ## Main ##
 class Bot():
@@ -581,7 +589,18 @@ class Bot():
         if onr:
             asyncio.run(onr())
 
+        # Keep alive
+        threading.Thread(target=keep_alive, args=(bot_session)).start()
+
         return True
+    
+
+    async def kill(self) -> None:
+        bot_session = bot_sessions[self]
+        auth = bot_session.token
+        bot_session.token = ""
+        bot_session.kill = True
+        requests.delete(url=server_activity, data={"auth":auth})
 
 
 ## Main ##

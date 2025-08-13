@@ -25,6 +25,7 @@ approve2_url = f"{api_url}/handle-permission"
 server = "https://api.bjarnos.dev/chatselfbot" # "http://127.0.0.1:3000" if you localhost server.js
 server_connect = f"{server}/connect"
 server_question = f"{server}/request"
+server_activity = f"{server}/active"
 
 # Headers
 standard_headers = {

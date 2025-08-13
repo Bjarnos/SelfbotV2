@@ -102,6 +102,17 @@ app.post("/active", (req, res) => {
   return res.status(200).json({ success: true, message: "Success" })
 })
 
+app.delete("/active", (req, res) => {
+  const { auth } = req.body
+  if (!auth || typeof auth !== "string") return res.status(400).json({ success: false, reason: "Missing or invalid 'auth'" })
+
+  const session = connectedClients[auth]
+  if (!session) return res.status(403).json({ success: false, reason: "Invalid auth" })
+
+  delete connectedClients[auth]
+  return res.status(200).json({ success: true, message: "Success" })
+})
+
 app.post("/connect", async (req, res) => {
   const { token } = req.body
   if (!token) return res.status(400).json({ success: false, reason: "Missing argument 'token'" })

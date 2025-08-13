@@ -12,6 +12,7 @@ class Session(): # bot session
         self.event_registry: dict = {}
         self.command_registry: dict = {}
         self.token: str = ""
+        self.kill: bool = False
 
 class ProfileConnection():
     def __init__(self, key: str, username: str, url: str):
