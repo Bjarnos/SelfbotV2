@@ -61,6 +61,20 @@ def check_type(value, class_, argnumber: int, internal: bool = True) -> bool:
     return True
 
 
+def debug_response(response: dict) -> str:
+    if not check_type(response, dict, 1, True): return "<unknown #2>"
+
+    ticket = response.get("ticket")
+    if ticket:
+        return f"sensitive error received, reference ticket #{ticket}"
+
+    reason = response.get("reason")
+    if reason:
+        return reason
+    else:
+        return "<unknown #1>"
+
+
 def server_request(type: str = "get", url: str = server_question, data: dict = {}) -> tuple[bool, requests.models.Response|None]:
     if not check_type(type, str, 1, True): return False, None
     if not check_type(url, str, 2, True): return False, None

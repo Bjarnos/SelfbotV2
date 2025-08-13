@@ -4,7 +4,7 @@ dotenv.load_dotenv()
 
 ## Shared ##
 # Dev/production mode
-version = "SelfbotV2 0.0.1"
+version = "Selfbot V2.0.0"
 show_http = True
 
 # OAUTH info
@@ -22,14 +22,9 @@ api_url = f"{url}/api/v1"
 approve_url = f"{api_url}/approve"
 approve2_url = f"{api_url}/handle-permission"
 
-server = "http://127.0.0.1:5000"
-server_connect = f"{server}/c"
-server_question = f"{server}/r"
-server_read = f"{server}/d"
-
-# Server
-token_size = 24
-token_url = f"{api_url}/token"
+server = "https://api.bjarnos.dev/chatselfbot" # "http://127.0.0.1:3000" if you localhost server.js
+server_connect = f"{server}/connect"
+server_question = f"{server}/request"
 
 # Headers
 standard_headers = {

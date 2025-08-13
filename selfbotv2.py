@@ -72,11 +72,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False, None
             else:
                 data = response.json()['json']
@@ -105,11 +106,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False, None
             else:
                 data = response.json()['json']
@@ -136,11 +138,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -169,11 +172,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -202,11 +206,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -229,11 +234,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return {}
             else:
                 data = response.json()['json']
@@ -270,11 +276,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -301,11 +308,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -334,11 +342,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False, None
             else:
                 data = response.json()['json']
@@ -365,11 +374,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -398,11 +408,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return False
             else:
                 data = response.json()['json']
@@ -425,11 +436,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return {}
             else:
                 data = response.json()['json']
@@ -457,11 +469,12 @@ class Bot():
             if not success:
                 reason = "<response isn't in json>"
                 try:
-                    reason = response.json().get('reason') or "<no reason provided>"
+                    json = response.json()
+                    reason = debug_response(json)
                 except Exception as e:
                     reason = f"<json parsing error: {e}>"
                 show_message(
-                    f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+                    f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
                 return
             else:
                 data = response.json()['json']
@@ -558,6 +571,8 @@ class Bot():
 
             bot_session.token = token
         else:
+            print(response.status_code)
+            print(response.text)
             show_message("Server had an error.", "Error")
             return False
 
@@ -591,11 +606,12 @@ async def is_username_available(username: str) -> bool | None:
     if not success:
         reason = "<response isn't in json>"
         try:
-            reason = response.json().get('reason') or "<no reason provided>"
+            json = response.json()
+            reason = debug_response(json)
         except Exception as e:
             reason = f"<json parsing error: {e}>"
         show_message(
-            f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+            f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
     else:
         data = response.json()['json']
         return data.get('available')
@@ -615,11 +631,12 @@ async def is_email_available(email: str) -> bool | None:
     if not success:
         reason = "<response isn't in json>"
         try:
-            reason = response.json().get('reason') or "<no reason provided>"
+            json = response.json()
+            reason = debug_response(json)
         except Exception as e:
             reason = f"<json parsing error: {e}>"
         show_message(
-            f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+            f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
     else:
         data = response.json()['json']
         return data.get('valid') and data.get('available')
@@ -639,11 +656,12 @@ async def is_email_verified(user: str) -> bool | None:
     if not success:
         reason = "<response isn't in json>"
         try:
-            reason = response.json().get('reason') or "<no reason provided>"
+            json = response.json()
+            reason = debug_response(json)
         except Exception as e:
             reason = f"<json parsing error: {e}>"
         show_message(
-            f"Error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
+            f"Server error in .{inspect.currentframe().f_code.co_name}(): {reason}", "Error")
     else:
         data = response.json()['json']
         return data.get('verified')
