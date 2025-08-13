@@ -1,14 +1,5 @@
-"""
-
-This is the server of SelfbotV2. It's not recommended to host this as well when creating a fork of Selfbot, but if you do:
-- Replace `server` in modules\\globals with your new server ip/link.
-- Ask the owner of Chat (Jona) if he can add a POST in api/<version>/group-message to your server/new with new message's content,
-  or create a redirect to my server which will already has that implemented.
-
-"""
-
 # Test stuff
-import os, subprocess, threading, sys
+import subprocess, threading, sys
 def run_test_script():
     time.sleep(2)
     print("Starting test.py!")
@@ -16,8 +7,7 @@ def run_test_script():
     subprocess.Popen([sys.executable, "test.py"], cwd=script_dir)
 
 # Server
-import requests, random, string, time, requests_cache, dotenv, sqlite3, json
-from threading import Lock
+import requests, random, string, time, requests_cache, dotenv, os
 from flask import Flask, request, jsonify
 from modules.globals import *
 
@@ -28,28 +18,8 @@ app = Flask(__name__)
 
 secret = os.getenv("SECRET")
 access_token = os.getenv("ACCESS_TOKEN")
-chat_token = os.getenv("CHAT_TOKEN") # token used by Jona to verify requests coming from chat
 
 connected_clients = {}
-
-class Datastore:
-    def __init__(self, db_path='local.db'):
-        self.conn = sqlite3.connect(db_path, check_same_thread=False, isolation_level=None)
-        self.lock = Lock()
-        self.conn.execute('PRAGMA journal_mode=WAL')
-        self.conn.execute('CREATE TABLE IF NOT EXISTS data (id TEXT PRIMARY KEY, value TEXT)')
-
-    def read(self, id_):
-        with self.lock:
-            cursor = self.conn.execute('SELECT value FROM data WHERE id = ?', (id_,))
-            row = cursor.fetchone()
-            return row[0] if row else None
-
-    def write(self, id_, value):
-        with self.lock:
-            self.conn.execute('INSERT OR REPLACE INTO data (id, value) VALUES (?, ?)', (id_, value))
-
-datastore = Datastore()
 
 # Methods
 def get_token(auth: str) -> str|None:
@@ -145,32 +115,6 @@ def incoming_request():
             "This may be an internal error"), 500
     else:
         return jsonify(success=False, reason="Invalid auth"), 401
-    
-@app.route("/new", methods=["POST"])
-def new_message():
-    # This endpoint is used internally by Chat for new group messages
-    # This endpoint will be rewritten soon
-    auth = request.headers.get('Authorization')
-    if auth.__class__ != str:
-        return jsonify(success=False, reason=f"Authorization header must be a string!"), 400
-    
-    if auth != f"Bearer {chat_token}":
-        return jsonify(success=False, reason=f"Authorization header is incorrect!"), 400
-
-    data = request.get_json(silent=False)
-    if not isinstance(data, dict):
-        return jsonify(success=False, reason="Data must be valid json!"), 400
-    
-    data = data.get('data')
-    if data.__class__ != dict:
-        return jsonify(success=False, reason=f"'data' must be a dict!"), 400
-        
-    id_ = data.get('id')
-    if not isinstance(id_, str): # I will replace everything with isinstance instead of __class__ later
-        return jsonify(success=False, reason="'id' must be a string in data!"), 400
-    datastore.write(id_, json.dumps(data))
-
-    return jsonify(success=True)
 
 if __name__ == "__main__":
     threading.Thread(target=run_test_script, daemon=True).start()

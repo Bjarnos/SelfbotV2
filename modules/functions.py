@@ -59,7 +59,7 @@ def check_type(value, class_, argnumber: int, internal: bool = True) -> bool:
         return False
 
     return True
-    
+
 
 def server_request(type: str = "get", url: str = server_question, data: dict = {}) -> tuple[bool, requests.models.Response|None]:
     if not check_type(type, str, 1, True): return False, None
